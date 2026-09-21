@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+*.yaml.local
+google-ads.yaml
+.env
+
+# Google Cloud Service-Account-Schluesseldateien (enthalten private Keys) --
+# duerfen niemals committet werden.
+*service-account*.json
+moosmoos-marketing-os-*.json
+

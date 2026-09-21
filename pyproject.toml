@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "google-ads-cli"
+version = "0.1.0"
+description = "Vollumfaengliche Kommandozeilen-CLI fuer die Google Ads API (v25), fuer die Nutzung durch KI-Agenten"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "google-ads>=32.0.0",
+    "typer>=0.12",
+    "pyyaml>=6.0",
+    "google-auth-oauthlib>=1.2",
+    "rich>=13.0",
+]
+
+[project.scripts]
+gads = "googleadscli.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.14",
+    "ruff>=0.6",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/googleadscli"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# BLE001: bewusste blinde except-Klausel als globale Fehlergrenze in _common.run_guarded.
+# B008: typer.Option()/typer.Argument() als Parameter-Default ist das Standard-Typer-Idiom.
+ignore = ["BLE001", "B008", "TRY004"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
