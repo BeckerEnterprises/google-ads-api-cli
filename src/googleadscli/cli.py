@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from googleadscli.commands import accounts, auth, call, highlevel, mutate, query
+from googleadscli.commands import accounts, auth, call, fields, highlevel, mutate, query
 
 app = typer.Typer(
     no_args_is_help=True,
@@ -67,6 +67,7 @@ def main_callback(
 app.add_typer(auth.app, name="auth", help="OAuth2-Einrichtung und Zugangspruefung")
 app.add_typer(accounts.app, name="accounts", help="Kontohierarchie / CIDs unter einem MCC")
 app.add_typer(highlevel.app, name="hl", help="Komfortbefehle fuer haeufige Workflows")
+app.add_typer(fields.app, name="fields", help="Feld-Metadaten der API nachschlagen")
 query.register(app)
 mutate.register(app)
 call.register(app)

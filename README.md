@@ -127,6 +127,23 @@ gads hl keyword add -c 1234567890 --ad-group customers/.../adGroups/222 --text "
 gads accounts list-hierarchy -c <MCC_CID>
 ```
 
+**Feld-Metadaten nachschlagen** (welche Felder bietet eine Ressource? kein
+Kundenkonto nötig — Wrapper um `GoogleAdsFieldService`, den globalen
+Feld-Katalog der API):
+```bash
+gads fields list ad_group                        # alle Felder von ad_group
+gads fields list ad_group --category METRIC       # nur Metriken
+gads fields list campaign.network_settings        # Felder einer Unter-Message
+gads fields show ad_group.status                  # volle Metadaten inkl. enum_values, selectable_with
+```
+Zeigt `selectable`/`filterable`/`sortable`/`enum_values`/`data_type` und (bei
+`show`) `selectable_with` (mit welchen anderen Ressourcen/Segmenten/Metriken
+sich das Feld in einer GAQL-Abfrage kombinieren lässt). Das sagt nur, was per
+GAQL *lesbar* ist — nicht, was per `mutate` *schreibbar* oder mit welchem
+`advertising_channel_type` kompatibel ist. Das lässt sich nur durch Lesen des
+Resource-Protos oder durch `--dry-run`-Ausprobieren herausfinden (siehe
+"Wie ich das selbst mache" unten).
+
 ## Agenten-Vertrag
 
 - Ausgabe: reines JSON auf stdout (Standard; `--format table`/`--format csv`
@@ -136,6 +153,26 @@ gads accounts list-hierarchy -c <MCC_CID>
   unerwarteter interner Fehler.
 - Mutate-Befehle laufen standardmäßig sofort durch (kein Bestätigungszwang,
   wichtig für autonome Agenten); `--dry-run` nutzt `validate_only` der API.
+
+## Feld-/Schema-Recherche jenseits von `gads fields`
+
+`gads fields` beantwortet "was ist per GAQL selectable/filterable?". Für
+"was ist bei `mutate` überhaupt als Feld vorhanden, und welchen Typ/Enum-Wert
+erwartet es?" hilft zusätzlich eine kurze Python-Introspektion gegen die
+lokal installierten, generierten Klassen der `google-ads`-Bibliothek (rein
+lokal, kein API-Call, keine Zugangsdaten nötig):
+
+```python
+from google.ads.googleads.v25.resources.types.ad_group import AdGroup
+for f in AdGroup.pb().DESCRIPTOR.fields:
+    print(f.name, [v.name for v in f.enum_type.values] if f.enum_type else f.type)
+```
+
+Für die dritte Frage — "ist dieses Feld bei `mutate` für einen bestimmten
+`advertising_channel_type` tatsächlich beschreibbar?" — gibt es keine
+Metadatenquelle; das zeigt nur ein echter `--dry-run`-Aufruf (siehe die
+Fehlercodes `OPERATION_NOT_PERMITTED_FOR_CONTEXT`, `IMMUTABLE_FIELD`,
+`SETTING_TYPE_IS_NOT_COMPATIBLE_WITH_CAMPAIGN` in `errors.py`).
 
 ## Tests
 
