@@ -1,4 +1,4 @@
-"""`gads query` -- generische GAQL-Ausfuehrung."""
+"""`gads query` -- generic GAQL execution."""
 
 from __future__ import annotations
 
@@ -14,12 +14,12 @@ def register(app: typer.Typer) -> None:
     def query_cmd(
         ctx: typer.Context,
         customer_id: str = typer.Option(..., "--customer-id", "-c", help="Google Ads Customer ID (CID)"),
-        gaql_query: str = typer.Option(..., "--gaql", "-q", help="GAQL-Query-String"),
+        gaql_query: str = typer.Option(..., "--gaql", "-q", help="GAQL query string"),
         paged: bool = typer.Option(
-            False, "--paged", help="search/SearchPager statt search_stream verwenden"
+            False, "--paged", help="Use search/SearchPager instead of search_stream"
         ),
     ) -> None:
-        """Fuehrt eine beliebige GAQL-Abfrage aus (Reporting/Lesen)."""
+        """Runs an arbitrary GAQL query (reporting/reading)."""
 
         def _run() -> None:
             client = _common.build_client(ctx)

@@ -1,4 +1,4 @@
-"""`gads auth login|status` -- einmalige OAuth2-Einrichtung fuer nicht-interaktive Nutzung."""
+"""`gads auth login|status` -- one-time OAuth2 setup for non-interactive use."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import typer
 from googleadscli import client_factory, config, formatting
 from googleadscli.commands._common import run_guarded
 
-app = typer.Typer(no_args_is_help=True, help="OAuth2-Einrichtung und Zugangspruefung")
+app = typer.Typer(no_args_is_help=True, help="OAuth2 setup and credential check")
 
 SCOPES = ["https://www.googleapis.com/auth/adwords"]
 
@@ -21,16 +21,16 @@ def login(
         None,
         "--developer-token",
         envvar="GOOGLE_ADS_DEVELOPER_TOKEN",
-        help="Optional: nicht noetig bei Cloud-managed Access ohne klassischen Developer Token",
+        help="Optional: not needed under cloud-managed access without a classic developer token",
     ),
     login_customer_id: str = typer.Option(
-        None, "--login-customer-id", help="Optionale MCC-CID, die standardmaessig als login-customer-id gesetzt wird"
+        None, "--login-customer-id", help="Optional MCC CID to use as the default login-customer-id"
     ),
     no_browser: bool = typer.Option(
-        False, "--no-browser", help="Auth-URL ausgeben statt Browser zu oeffnen (fuer SSH/Remote-Sessions)"
+        False, "--no-browser", help="Print the auth URL instead of opening a browser (for SSH/remote sessions)"
     ),
 ) -> None:
-    """Fuehrt einmalig den interaktiven OAuth2-Consent-Flow aus und speichert den Refresh Token."""
+    """Runs the interactive OAuth2 consent flow once and stores the refresh token."""
 
     def _run() -> None:
         from google_auth_oauthlib.flow import InstalledAppFlow
@@ -69,29 +69,29 @@ def use_service_account(
     json_key_file_path: str = typer.Option(
         ...,
         "--json-key-file-path",
-        help="Pfad zur Service-Account-JSON-Schluesseldatei aus der Google Cloud Console",
+        help="Path to the service-account JSON key file from the Google Cloud Console",
     ),
     developer_token: str = typer.Option(
         None,
         "--developer-token",
         envvar="GOOGLE_ADS_DEVELOPER_TOKEN",
-        help="Optional: nicht noetig bei Cloud-managed Access ohne klassischen Developer Token",
+        help="Optional: not needed under cloud-managed access without a classic developer token",
     ),
     impersonated_email: str = typer.Option(
         None,
         "--impersonated-email",
-        help="Nur fuer Domain-Wide-Delegation: zu impersonierender Workspace-Nutzer. "
-        "Nicht noetig, wenn die client_email der Schluesseldatei direkt als Nutzer auf dem "
-        "Google-Ads-Konto/MCC hinterlegt wurde.",
+        help="Only for domain-wide delegation: the Workspace user to impersonate. "
+        "Not needed if the key file's client_email has been added directly as a user "
+        "on the Google Ads account/MCC.",
     ),
-    login_customer_id: str = typer.Option(None, "--login-customer-id", help="Optionale MCC-CID"),
+    login_customer_id: str = typer.Option(None, "--login-customer-id", help="Optional MCC CID"),
 ) -> None:
-    """Richtet Service-Account-basierte Authentifizierung ein (kein interaktiver Consent noetig).
+    """Sets up service-account-based authentication (no interactive consent needed).
 
-    Voraussetzung: die client_email aus der JSON-Schluesseldatei muss auf dem
-    Google-Ads-Konto (oder MCC) als Nutzer mit passendem Zugriffslevel hinterlegt sein
-    (Tools & Einstellungen > Zugriff und Sicherheit > Nutzer), es sei denn, es wird
-    stattdessen per --impersonated-email eine Domain-Wide-Delegation genutzt.
+    Prerequisite: the client_email from the JSON key file must be added as a
+    user with the appropriate access level on the Google Ads account (or MCC)
+    (Tools & Settings > Access and Security > Users), unless domain-wide
+    delegation is used instead via --impersonated-email.
     """
 
     def _run() -> None:
@@ -100,11 +100,11 @@ def use_service_account(
 
         key_path = Path(json_key_file_path).expanduser().resolve()
         if not key_path.exists():
-            raise config.ConfigError(f"Service-Account-Schluesseldatei nicht gefunden: {key_path}")
+            raise config.ConfigError(f"Service account key file not found: {key_path}")
         key_data = _json.loads(key_path.read_text(encoding="utf-8"))
         if key_data.get("type") != "service_account":
             raise config.ConfigError(
-                f"Datei {key_path} ist kein Service-Account-Schluessel (type={key_data.get('type')!r})."
+                f"File {key_path} is not a service-account key (type={key_data.get('type')!r})."
             )
 
         data: dict = {"json_key_file_path": str(key_path)}
@@ -121,8 +121,8 @@ def use_service_account(
                 "status": "ok",
                 "config_path": str(path),
                 "service_account_email": key_data.get("client_email"),
-                "hint": "Stelle sicher, dass diese client_email als Nutzer auf dem Google-Ads-Konto "
-                "hinterlegt ist, falls --impersonated-email nicht gesetzt wurde.",
+                "hint": "Make sure this client_email has been added as a user on the Google Ads "
+                "account, unless --impersonated-email was set.",
             },
             fmt=ctx.obj["format"],
         )
@@ -132,7 +132,7 @@ def use_service_account(
 
 @app.command("status")
 def status(ctx: typer.Context) -> None:
-    """Prueft die aktuelle Konfiguration gegen die echte API (list_accessible_customers)."""
+    """Checks the current configuration against the real API (list_accessible_customers)."""
 
     def _run() -> None:
         client = client_factory.build_client(

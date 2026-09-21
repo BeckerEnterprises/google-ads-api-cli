@@ -1,4 +1,4 @@
-"""`gads hl keyword add` -- Keyword als AdGroupCriterion hinzufuegen."""
+"""`gads hl keyword add` -- add a keyword as an AdGroupCriterion."""
 
 from __future__ import annotations
 
@@ -8,15 +8,15 @@ from googleadscli import formatting, proto_bridge
 from googleadscli.commands import _common
 from googleadscli.utils import normalize_customer_id
 
-app = typer.Typer(no_args_is_help=True, help="Keywords hinzufuegen/verwalten")
+app = typer.Typer(no_args_is_help=True, help="Add/manage keywords")
 
 
 @app.command("add")
 def add(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
-    ad_group_resource_name: str = typer.Option(..., "--ad-group", help="Resource-Name der Ad Group"),
-    text: str = typer.Option(..., "--text", help="Keyword-Text"),
+    ad_group_resource_name: str = typer.Option(..., "--ad-group", help="Resource name of the ad group"),
+    text: str = typer.Option(..., "--text", help="Keyword text"),
     match_type: str = typer.Option("BROAD", "--match-type", help="EXACT|PHRASE|BROAD"),
     status: str = typer.Option("ENABLED", "--status"),
     cpc_bid_micros: int = typer.Option(None, "--cpc-bid-micros"),

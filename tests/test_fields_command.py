@@ -1,4 +1,4 @@
-"""Tests fuer `gads fields list|show` (GoogleAdsFieldService-Wrapper)."""
+"""Tests for `gads fields list|show` (GoogleAdsFieldService wrapper)."""
 
 from __future__ import annotations
 

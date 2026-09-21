@@ -1,15 +1,15 @@
-"""`gads fields <resource>` -- Feld-Metadaten der Google Ads API nachschlagen.
+"""`gads fields <resource>` -- look up Google Ads API field metadata.
 
-Duenner Komfort-Wrapper um GoogleAdsFieldService.SearchGoogleAdsFields (eine
-GAQL-aehnliche Mini-Query-Sprache gegen den globalen Feld-Katalog der API,
-kein Kundenkonto noetig). Beantwortet Fragen wie "welche Felder bietet
-ad_group?" ohne dass man die Mini-Query-Syntax von Hand bauen muss.
+Thin convenience wrapper around GoogleAdsFieldService.SearchGoogleAdsFields (a
+GAQL-like mini query language against the API's global field catalog, no
+customer account needed). Answers questions like "which fields does ad_group
+offer?" without having to hand-build the mini-query syntax.
 
-Hinweis: Diese Metadaten sagen nur, was *selectable*/*filterable*/*sortable*
-per GAQL ist -- nicht, was per `mutate` *schreibbar* oder mit welchem
-advertising_channel_type kompatibel ist. Das laesst sich nur durch Lesen des
-Resource-Protos (siehe README) oder durch tatsaechliches Ausprobieren
-(--dry-run) herausfinden.
+Note: this metadata only tells you what's *selectable*/*filterable*/*sortable*
+via GAQL -- not what's *writable* via `mutate`, or which
+advertising_channel_type it's compatible with. That can only be discovered by
+reading the resource proto (see README) or by actually trying it
+(--dry-run).
 """
 
 from __future__ import annotations
@@ -17,9 +17,9 @@ from __future__ import annotations
 import typer
 
 from googleadscli import formatting, proto_bridge
-from googleadscli.commands._common import build_client, run_guarded
+from googleadscli.commands import _common
 
-app = typer.Typer(no_args_is_help=True, help="Feld-Metadaten der API nachschlagen (kein Kundenkonto noetig)")
+app = typer.Typer(no_args_is_help=True, help="Look up API field metadata (no customer account needed)")
 
 _DEFAULT_SELECT = "name, category, data_type, selectable, filterable, sortable, is_repeated, enum_values"
 
@@ -28,33 +28,33 @@ _DEFAULT_SELECT = "name, category, data_type, selectable, filterable, sortable, 
 def list_fields(
     ctx: typer.Context,
     resource: str = typer.Argument(
-        ..., help="Ressourcen- oder Feldname bzw. -praefix, z.B. 'ad_group' oder 'campaign.network_settings'"
+        ..., help="Resource or field name/prefix, e.g. 'ad_group' or 'campaign.network_settings'"
     ),
     category: str = typer.Option(
         None,
         "--category",
-        help="Nur diese Kategorie: RESOURCE|ATTRIBUTE|SEGMENT|METRIC (Default: alle)",
+        help="Only this category: RESOURCE|ATTRIBUTE|SEGMENT|METRIC (default: all)",
     ),
     exact: bool = typer.Option(
-        False, "--exact", help="Nur exakten Feldnamen nachschlagen statt Praefix-Suche"
+        False, "--exact", help="Look up the exact field name instead of a prefix search"
     ),
 ) -> None:
-    """Listet Feld-Metadaten (selectable/filterable/sortable/enum_values/...) fuer ein Praefix."""
+    """Lists field metadata (selectable/filterable/sortable/enum_values/...) for a prefix."""
 
     def _run() -> None:
         if exact:
             where = f'name = "{resource}"'
         else:
-            # Die Mini-Query-Sprache von GoogleAdsFieldService kennt kein OR,
-            # daher listet dies nur die Kindfelder (Praefix); der exakte
-            # Ressourcen-Eintrag selbst laesst sich per 'gads fields show' holen.
+            # GoogleAdsFieldService's mini query language doesn't support OR,
+            # so this only lists the child fields (prefix); the exact
+            # resource entry itself can be fetched via 'gads fields show'.
             where = f'name LIKE "{resource}.%"'
         if category:
             where += f' AND category = "{category.upper()}"'
 
         query = f"SELECT {_DEFAULT_SELECT} WHERE {where}"
 
-        client = build_client(ctx)
+        client = _common.build_client(ctx)
         rows = proto_bridge.invoke_call(
             client,
             "GoogleAdsFieldService",
@@ -64,18 +64,18 @@ def list_fields(
         )
         formatting.render(rows, fmt=ctx.obj["format"])
 
-    run_guarded(ctx, _run)
+    _common.run_guarded(ctx, _run)
 
 
 @app.command("show")
 def show_field(
     ctx: typer.Context,
-    name: str = typer.Argument(..., help="Exakter Feld- oder Ressourcenname, z.B. 'ad_group.status'"),
+    name: str = typer.Argument(..., help="Exact field or resource name, e.g. 'ad_group.status'"),
 ) -> None:
-    """Zeigt die vollstaendigen Metadaten (inkl. selectable_with) fuer genau einen Feld-/Ressourcennamen."""
+    """Shows the full metadata (incl. selectable_with) for exactly one field/resource name."""
 
     def _run() -> None:
-        client = build_client(ctx)
+        client = _common.build_client(ctx)
         rows = proto_bridge.invoke_call(
             client,
             "GoogleAdsFieldService",
@@ -91,4 +91,4 @@ def show_field(
         )
         formatting.render(rows[0] if rows else {}, fmt=ctx.obj["format"])
 
-    run_guarded(ctx, _run)
+    _common.run_guarded(ctx, _run)

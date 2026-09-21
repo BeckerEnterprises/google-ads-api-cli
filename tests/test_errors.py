@@ -1,4 +1,4 @@
-"""Tests fuer die strukturierte Fehlerausgabe (GoogleAdsException -> JSON)."""
+"""Tests for structured error output (GoogleAdsException -> JSON)."""
 
 from __future__ import annotations
 

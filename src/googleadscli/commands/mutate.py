@@ -1,4 +1,4 @@
-"""`gads mutate <resource>` -- generischer Create/Update/Remove fuer jede Ressource."""
+"""`gads mutate <resource>` -- generic create/update/remove for any resource."""
 
 from __future__ import annotations
 
@@ -14,29 +14,29 @@ def register(app: typer.Typer) -> None:
     def mutate_cmd(
         ctx: typer.Context,
         resource: str = typer.Argument(
-            ..., help="Ressourcen-Key in snake_case, z.B. 'campaign', 'ad_group_criterion'"
+            ..., help="Resource key in snake_case, e.g. 'campaign', 'ad_group_criterion'"
         ),
         customer_id: str = typer.Option(..., "--customer-id", "-c"),
         operations_json: str = typer.Option(
             ...,
             "--operations-json",
             "-o",
-            help="JSON-Array von Operationen ({'create'|'update'|'remove': ...}); "
-            "mit '@pfad.json' aus Datei laden",
+            help="JSON array of operations ({'create'|'update'|'remove': ...}); "
+            "load from a file with '@path.json'",
         ),
         dry_run: bool = typer.Option(
-            False, "--dry-run", help="validate_only: nur validieren, nichts aendern"
+            False, "--dry-run", help="validate_only: only validate, don't change anything"
         ),
         partial_failure: bool = typer.Option(
-            False, "--partial-failure", help="Einzelne fehlschlagende Operationen nicht die ganze Anfrage abbrechen lassen"
+            False, "--partial-failure", help="Don't fail the whole request if individual operations fail"
         ),
     ) -> None:
-        """Fuehrt create/update/remove-Operationen fuer eine Ressource aus."""
+        """Runs create/update/remove operations for a resource."""
 
         def _run() -> None:
             operations = load_json_arg(operations_json)
             if not isinstance(operations, list):
-                raise ValueError("--operations-json muss ein JSON-Array von Operationen sein.")
+                raise ValueError("--operations-json must be a JSON array of operations.")
 
             client = _common.build_client(ctx)
             result = proto_bridge.run_mutate(

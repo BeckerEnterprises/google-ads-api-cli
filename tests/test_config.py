@@ -1,4 +1,4 @@
-"""Tests fuer die Config-Precedence: CLI-Flags > Env-Vars > Config-Datei."""
+"""Tests for the config precedence: CLI flags > env vars > config file."""
 
 from __future__ import annotations
 

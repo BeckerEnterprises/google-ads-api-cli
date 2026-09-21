@@ -1,9 +1,9 @@
-"""`gads call <Service> <Methode>` -- generischer Fallback fuer jede API-Methode.
+"""`gads call <Service> <Method>` -- generic fallback for any API method.
 
-Deckt alles ab, was kein regulaerer `mutate_*`-Aufruf ist: BatchJobService,
+Covers everything that isn't a regular `mutate_*` call: BatchJobService,
 ConversionUploadService, OfflineUserDataJobService, KeywordPlanService,
-ReachPlanService, GoogleAdsFieldService, CustomerService, Long-Running-
-Operations, etc.
+ReachPlanService, GoogleAdsFieldService, CustomerService, long-running
+operations, etc.
 """
 
 from __future__ import annotations
@@ -19,24 +19,24 @@ def register(app: typer.Typer) -> None:
     @app.command("call")
     def call_cmd(
         ctx: typer.Context,
-        service: str = typer.Argument(..., help="Service-Name, z.B. 'BatchJobService'"),
-        method: str = typer.Argument(..., help="Methodenname (snake_case), z.B. 'mutate' oder 'run_batch_job'"),
+        service: str = typer.Argument(..., help="Service name, e.g. 'BatchJobService'"),
+        method: str = typer.Argument(..., help="Method name (snake_case), e.g. 'mutate' or 'run_batch_job'"),
         request_json: str = typer.Option(
-            "{}", "--request-json", "-r", help="JSON-Objekt als Request-Payload; mit '@pfad.json' aus Datei laden"
+            "{}", "--request-json", "-r", help="JSON object as the request payload; load from a file with '@path.json'"
         ),
         no_wait: bool = typer.Option(
-            False, "--no-wait", help="Bei Long-Running-Operations nicht auf das Ergebnis warten"
+            False, "--no-wait", help="Don't wait for the result of long-running operations"
         ),
         timeout: float = typer.Option(
-            None, "--timeout", help="Timeout in Sekunden beim Warten auf eine Long-Running-Operation"
+            None, "--timeout", help="Timeout in seconds when waiting for a long-running operation"
         ),
     ) -> None:
-        """Ruft eine beliebige Service-Methode generisch auf (voller API-Fallback)."""
+        """Generically calls any service method (full API fallback)."""
 
         def _run() -> None:
             payload = load_json_arg(request_json)
             if payload is not None and not isinstance(payload, dict):
-                raise ValueError("--request-json muss ein JSON-Objekt sein.")
+                raise ValueError("--request-json must be a JSON object.")
 
             client = _common.build_client(ctx)
             result = proto_bridge.invoke_call(
@@ -54,7 +54,7 @@ def register(app: typer.Typer) -> None:
 
     @app.command("list-services")
     def list_services_cmd(ctx: typer.Context) -> None:
-        """Listet alle verfuegbaren Service-Namen der aktiven API-Version."""
+        """Lists all available service names of the active API version."""
 
         def _run() -> None:
             names = proto_bridge.list_service_names(version=ctx.obj["version"])
@@ -64,9 +64,9 @@ def register(app: typer.Typer) -> None:
 
     @app.command("list-methods")
     def list_methods_cmd(
-        ctx: typer.Context, service: str = typer.Argument(..., help="Service-Name, z.B. 'CampaignService'")
+        ctx: typer.Context, service: str = typer.Argument(..., help="Service name, e.g. 'CampaignService'")
     ) -> None:
-        """Listet alle aufrufbaren Methoden eines Service auf."""
+        """Lists all callable methods of a service."""
 
         def _run() -> None:
             client = _common.build_client(ctx)

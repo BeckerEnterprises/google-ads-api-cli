@@ -1,4 +1,4 @@
-"""End-to-End-Test des generischen `gads call`-Kommandos ueber die Typer-CLI."""
+"""End-to-end test of the generic `gads call` command via the Typer CLI."""
 
 from __future__ import annotations
 

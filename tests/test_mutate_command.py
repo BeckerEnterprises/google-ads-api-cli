@@ -1,4 +1,4 @@
-"""End-to-End-Test des `gads mutate`-Kommandos ueber die Typer-CLI."""
+"""End-to-end test of the `gads mutate` command via the Typer CLI."""
 
 from __future__ import annotations
 
@@ -86,4 +86,4 @@ def test_mutate_command_invalid_operations_json_exits_1():
     )
     assert result.exit_code == 1
     payload = json.loads(result.output)
-    assert "muss ein JSON-Array" in payload["message"]
+    assert "must be a JSON array" in payload["message"]

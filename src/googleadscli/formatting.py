@@ -1,4 +1,4 @@
-"""Ausgabeformatierung: json (Standard, agentenfreundlich), table, csv."""
+"""Output formatting: json (default, agent-friendly), table, csv."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def render(data: Any, *, fmt: str = "json") -> None:
         from rich.table import Table
 
         if not flat_rows:
-            print("(keine Ergebnisse)")
+            print("(no results)")
             return
         fieldnames = list({key for row in flat_rows for key in row})
         table = Table(show_header=True, header_style="bold")
@@ -52,4 +52,4 @@ def render(data: Any, *, fmt: str = "json") -> None:
         Console().print(table)
         return
 
-    raise ValueError(f"Unbekanntes Ausgabeformat: {fmt}")
+    raise ValueError(f"Unknown output format: {fmt}")

@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "google-ads-cli"
-version = "0.0.1"
-description = "Vollumfaengliche Kommandozeilen-CLI fuer die Google Ads API (v25), fuer die Nutzung durch KI-Agenten"
+version = "0.0.2"
+description = "Full-featured command-line CLI for the Google Ads API (v25), built for use by AI agents"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -35,8 +35,8 @@ line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-# BLE001: bewusste blinde except-Klausel als globale Fehlergrenze in _common.run_guarded.
-# B008: typer.Option()/typer.Argument() als Parameter-Default ist das Standard-Typer-Idiom.
+# BLE001: intentional blind except clause as the global error boundary in _common.run_guarded.
+# B008: typer.Option()/typer.Argument() as a parameter default is the standard Typer idiom.
 ignore = ["BLE001", "B008", "TRY004"]
 
 [tool.pytest.ini_options]

@@ -1,4 +1,4 @@
-"""`gads hl ad create-responsive-search-ad` -- Responsive Search Ad anlegen."""
+"""`gads hl ad create-responsive-search-ad` -- create a responsive search ad."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from googleadscli import formatting, proto_bridge
 from googleadscli.commands import _common
 from googleadscli.utils import normalize_customer_id
 
-app = typer.Typer(no_args_is_help=True, help="Anzeigen anlegen/verwalten")
+app = typer.Typer(no_args_is_help=True, help="Create/manage ads")
 
 
 @app.command("create-responsive-search-ad")
@@ -17,8 +17,8 @@ def create_responsive_search_ad(
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
     ad_group_resource_name: str = typer.Option(..., "--ad-group"),
     final_url: str = typer.Option(..., "--final-url"),
-    headline: list[str] = typer.Option(..., "--headline", help="Mehrfach angebbar, min. 3 empfohlen"),
-    description: list[str] = typer.Option(..., "--description", help="Mehrfach angebbar, min. 2 empfohlen"),
+    headline: list[str] = typer.Option(..., "--headline", help="Can be given multiple times, 3+ recommended"),
+    description: list[str] = typer.Option(..., "--description", help="Can be given multiple times, 2+ recommended"),
     status: str = typer.Option("PAUSED", "--status"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:

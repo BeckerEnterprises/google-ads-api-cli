@@ -1,7 +1,7 @@
-"""Komfortbefehle fuer haeufige Workflows -- duenne Wrapper ueber `mutate`/`call`.
+"""Convenience commands for common workflows -- thin wrappers over `mutate`/`call`.
 
-Vollstaendigkeit ist bereits durch die generischen Basisbefehle (query/mutate/
-call) gegeben; diese Befehle dienen nur der Ergonomie.
+Completeness is already provided by the generic base commands (query/mutate/
+call); these commands exist purely for ergonomics.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ import typer
 
 from googleadscli.commands.highlevel import ad, ad_group, budget, campaign, keyword
 
-app = typer.Typer(no_args_is_help=True, help="Komfortbefehle fuer haeufige Workflows")
+app = typer.Typer(no_args_is_help=True, help="Convenience commands for common workflows")
 app.add_typer(budget.app, name="budget")
 app.add_typer(campaign.app, name="campaign")
 app.add_typer(ad_group.app, name="ad-group")

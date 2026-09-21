@@ -1,4 +1,4 @@
-"""Tests fuer die Ausgabeformatierung (json/table/csv)."""
+"""Tests for output formatting (json/table/csv)."""
 
 from __future__ import annotations
 

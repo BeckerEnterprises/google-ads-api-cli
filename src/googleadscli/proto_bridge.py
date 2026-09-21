@@ -1,19 +1,20 @@
-"""Generische JSON<->Protobuf-Bruecke fuer beliebige Google-Ads-API-Ressourcen/Services.
+"""Generic JSON<->protobuf bridge for any Google Ads API resource/service.
 
-Kernidee: Statt fuer jede der >50 Services / hunderte Ressourcen eigenen Code zu
-schreiben, wird die GAPIC-Namenskonvention der Google Ads API per Reflection
-ausgenutzt:
+Core idea: instead of writing dedicated code for each of the 50+ services /
+hundreds of resources, the Google Ads API's GAPIC naming convention is
+exploited via reflection:
 
-- Jede mutierbare Ressource ``x`` (snake_case) hat einen eponymen Service
-  ``XService`` mit genau einer ``mutate_*``-Methode, deren Request ein
-  ``operations``-Feld vom Typ ``XOperation`` besitzt.
-- Jede generierte Service-Methode hat die Signatur
-  ``method(request: Union[XyzRequest, dict, None] = None, ...)`` -- daraus laesst
-  sich der Request-Typ dynamisch extrahieren.
+- Every mutable resource ``x`` (snake_case) has an eponymous service
+  ``XService`` with exactly one ``mutate_*`` method whose request has an
+  ``operations`` field of type ``XOperation``.
+- Every generated service method has the signature
+  ``method(request: Union[XyzRequest, dict, None] = None, ...)`` -- the
+  request type can be extracted from this dynamically.
 
-Alle Messages sind proto-plus-Typen (``use_proto_plus=True``, siehe config.py),
-die eigene ``to_dict``/``from_json``/dict-Konstruktoren mitbringen und damit eine
-robuste generische JSON<->Message-Konvertierung ohne Sonderfaelle ermoeglichen.
+All messages are proto-plus types (``use_proto_plus=True``, see config.py),
+which come with their own ``to_dict``/``from_json``/dict constructors and
+thereby enable a robust, generic JSON<->message conversion without special
+cases.
 """
 
 from __future__ import annotations
@@ -38,7 +39,7 @@ _TO_DICT_KWARGS = {
 
 
 class BridgeError(Exception):
-    """Fehler bei der Aufloesung oder Ausfuehrung eines generischen API-Aufrufs."""
+    """Error resolving or executing a generic API call."""
 
 
 def to_camel(resource_key: str) -> str:
@@ -80,7 +81,7 @@ def _services_package(version: str):
 
 
 def _iter_all_service_names(version: str) -> list[str]:
-    """Listet alle Service-Namen (PascalCase) der gegebenen API-Version auf."""
+    """Lists all service names (PascalCase) of the given API version."""
     pkg = _services_package(version)
     names = []
     for module_info in pkgutil.iter_modules(pkg.__path__):
@@ -109,11 +110,11 @@ def _find_mutate_method(service: Any, operation_type_name: str) -> tuple[str, ty
 
 
 def resolve_mutate_target(client, resource_key: str, version: str = DEFAULT_VERSION) -> MutateTarget:
-    """Findet Service + Mutate-Methode + Operation-Typ fuer eine Ressource.
+    """Finds the service + mutate method + operation type for a resource.
 
-    Versucht zuerst den eponymen Service (schnell, funktioniert fuer praktisch
-    alle Ressourcen). Faellt andernfalls auf einen Scan ueber alle Services
-    zurueck (Robustheit gegen zukuenftige Namenskonvention-Ausnahmen).
+    Tries the eponymous service first (fast, works for practically all
+    resources). Otherwise falls back to scanning all services (robustness
+    against future exceptions to the naming convention).
     """
     camel = to_camel(resource_key)
     operation_type_name = f"{camel}Operation"
@@ -150,24 +151,24 @@ def resolve_mutate_target(client, resource_key: str, version: str = DEFAULT_VERS
             )
 
     raise BridgeError(
-        f"Keine mutate-faehige Ressource '{resource_key}' gefunden "
-        f"(erwarteter Operation-Typ: {operation_type_name})."
+        f"No mutate-capable resource '{resource_key}' found "
+        f"(expected operation type: {operation_type_name})."
     )
 
 
 def build_operation(target: MutateTarget, op_dict: dict) -> Any:
-    """Baut eine <Resource>Operation-Instanz aus einem JSON-Operationsdict.
+    """Builds a <Resource>Operation instance from a JSON operation dict.
 
-    Erwartetes Format: {"create": {...}} | {"update": {...}, "update_mask": [...]}
-    | {"remove": "resource_name"}. Bei "update" ohne explizite update_mask wird
-    die Maske automatisch aus den gesetzten Feldern abgeleitet (wie in den
-    offiziellen Google-Ads-Python-Beispielen).
+    Expected format: {"create": {...}} | {"update": {...}, "update_mask": [...]}
+    | {"remove": "resource_name"}. For "update" without an explicit
+    update_mask, the mask is derived automatically from the fields that were
+    set (as in the official Google Ads Python examples).
     """
     keys = {"create", "update", "remove"} & op_dict.keys()
     if len(keys) != 1:
         raise BridgeError(
-            "Jede Operation braucht genau eines von 'create', 'update', 'remove': "
-            f"erhalten wurde {sorted(op_dict.keys())}"
+            "Every operation needs exactly one of 'create', 'update', 'remove': "
+            f"got {sorted(op_dict.keys())}"
         )
 
     if "create" in op_dict:
@@ -178,7 +179,7 @@ def build_operation(target: MutateTarget, op_dict: dict) -> Any:
 
     update_payload = op_dict["update"]
     if "resource_name" not in update_payload:
-        raise BridgeError("'update'-Operationen benoetigen ein 'resource_name'-Feld im Payload.")
+        raise BridgeError("'update' operations require a 'resource_name' field in the payload.")
     operation = target.operation_cls(update=update_payload)
     update_mask = op_dict.get("update_mask")
     if update_mask is not None:
@@ -226,8 +227,8 @@ def resolve_call_target(client, service_name: str, method_name: str, version: st
     if method is None or not callable(method):
         available = sorted(a for a in dir(service) if not a.startswith("_") and callable(getattr(service, a)))
         raise BridgeError(
-            f"Service '{service_name}' hat keine Methode '{method_name}'. "
-            f"Verfuegbare Methoden: {available}"
+            f"Service '{service_name}' has no method '{method_name}'. "
+            f"Available methods: {available}"
         )
 
     request_cls = _request_class_of(method)

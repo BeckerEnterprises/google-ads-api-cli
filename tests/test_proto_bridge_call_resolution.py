@@ -1,4 +1,4 @@
-"""Tests fuer den generischen `call`-Fallback-Bridge (beliebiger Service/Methode)."""
+"""Tests for the generic `call` fallback bridge (any service/method)."""
 
 from __future__ import annotations
 

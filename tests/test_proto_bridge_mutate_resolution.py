@@ -1,4 +1,4 @@
-"""Reflection-Tests gegen echte generierte GAPIC-/Protobuf-Klassen (kein Netzwerk)."""
+"""Reflection tests against real generated GAPIC/protobuf classes (no network)."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from googleadscli import proto_bridge as pb
         ("campaign", "mutate_campaigns"),
         ("campaign_budget", "mutate_campaign_budgets"),
         ("ad_group", "mutate_ad_groups"),
-        # Unregelmaessige Pluralisierung: criterion -> criteria.
+        # Irregular pluralization: criterion -> criteria.
         ("ad_group_criterion", "mutate_ad_group_criteria"),
         ("ad_group_ad", "mutate_ad_group_ads"),
         ("customer_label", "mutate_customer_labels"),

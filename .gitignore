@@ -11,8 +11,8 @@ dist/
 google-ads.yaml
 .env
 
-# Google Cloud Service-Account-Schluesseldateien (enthalten private Keys) --
-# duerfen niemals committet werden.
+# Google Cloud service account key files (contain private keys) --
+# must never be committed.
 *service-account*.json
 moosmoos-marketing-os-*.json
 

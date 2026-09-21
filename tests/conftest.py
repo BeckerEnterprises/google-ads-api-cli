@@ -1,11 +1,11 @@
-"""Gemeinsame Test-Fixtures.
+"""Shared test fixtures.
 
-Die Konstruktion eines GoogleAdsClient (auch nur zum Zweck der Reflection ueber
-Service-/Message-Klassen) loest normalerweise einen echten OAuth-Refresh-Call
-aus (siehe google.ads.googleads.oauth2). Da Reflection und JSON<->Proto-
-Konvertierung selbst komplett offline funktionieren, wird hier lediglich der
-Credentials-Refresh no-op gepatcht -- alle weiteren Tests laufen ohne
-Netzwerkzugriff gegen echte generierte Protobuf-/GAPIC-Klassen.
+Constructing a GoogleAdsClient (even just for reflection over service/message
+classes) normally triggers a real OAuth refresh call (see
+google.ads.googleads.oauth2). Since reflection and JSON<->proto conversion
+themselves work fully offline, the credentials refresh is simply patched to a
+no-op here -- all further tests run without network access, against real
+generated protobuf/GAPIC classes.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""`gads hl ad-group create` -- Ad Group anlegen."""
+"""`gads hl ad-group create` -- create an ad group."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from googleadscli import formatting, proto_bridge
 from googleadscli.commands import _common
 from googleadscli.utils import normalize_customer_id
 
-app = typer.Typer(no_args_is_help=True, help="Ad Groups anlegen/verwalten")
+app = typer.Typer(no_args_is_help=True, help="Create/manage ad groups")
 
 
 @app.command("create")
@@ -16,9 +16,9 @@ def create(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
     name: str = typer.Option(..., "--name"),
-    campaign_resource_name: str = typer.Option(..., "--campaign", help="Resource-Name der Kampagne"),
+    campaign_resource_name: str = typer.Option(..., "--campaign", help="Resource name of the campaign"),
     status: str = typer.Option("PAUSED", "--status"),
-    ad_group_type: str = typer.Option("SEARCH_STANDARD", "--type", help="AdGroupTypeEnum-Wert"),
+    ad_group_type: str = typer.Option("SEARCH_STANDARD", "--type", help="AdGroupTypeEnum value"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     def _run() -> None:

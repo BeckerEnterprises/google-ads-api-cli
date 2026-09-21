@@ -1,4 +1,4 @@
-"""Konfigurations-Precedence: CLI-Flags > GOOGLE_ADS_*-Env-Vars > Config-Datei."""
+"""Config precedence: CLI flags > GOOGLE_ADS_* env vars > config file."""
 
 from __future__ import annotations
 
@@ -11,23 +11,23 @@ import yaml
 DEFAULT_CONFIG_PATH = Path.home() / ".config" / "google-ads-cli" / "google-ads.yaml"
 LEGACY_CONFIG_PATH = Path.home() / "google-ads.yaml"
 
-# Feldname (google-ads.yaml / GoogleAdsClient) -> Env-Var-Name
+# Field name (google-ads.yaml / GoogleAdsClient) -> env var name
 ENV_VAR_MAP = {
     "developer_token": "GOOGLE_ADS_DEVELOPER_TOKEN",
-    # OAuth2 Installed-App-Flow (interaktiver Consent, siehe 'gads auth login').
+    # OAuth2 installed-app flow (interactive consent, see 'gads auth login').
     "client_id": "GOOGLE_ADS_CLIENT_ID",
     "client_secret": "GOOGLE_ADS_CLIENT_SECRET",
     "refresh_token": "GOOGLE_ADS_REFRESH_TOKEN",
-    # OAuth2 Service-Account-Flow: JSON-Schluesseldatei aus der Google Cloud
-    # Console, deren client_email direkt als Nutzer auf dem Google-Ads-Konto
-    # (oder MCC) hinterlegt wird -- kein interaktiver Consent noetig.
+    # OAuth2 service-account flow: JSON key file from the Google Cloud
+    # Console, whose client_email is added directly as a user on the Google
+    # Ads account (or MCC) -- no interactive consent needed.
     "json_key_file_path": "GOOGLE_ADS_JSON_KEY_FILE_PATH",
-    # Nur fuer Domain-Wide-Delegation noetig (Service Account impersoniert
-    # einen echten Workspace-Nutzer). Bei direkt freigeschaltetem Service-
-    # Account-Zugriff auf das Ads-Konto bleibt dies leer.
+    # Only needed for domain-wide delegation (service account impersonates a
+    # real Workspace user). Left empty when the service account has been
+    # granted direct access to the Ads account.
     "impersonated_email": "GOOGLE_ADS_IMPERSONATED_EMAIL",
-    # Application Default Credentials (z.B. GOOGLE_APPLICATION_CREDENTIALS
-    # oder 'gcloud auth application-default login').
+    # Application Default Credentials (e.g. GOOGLE_APPLICATION_CREDENTIALS
+    # or 'gcloud auth application-default login').
     "use_application_default_credentials": "GOOGLE_ADS_USE_APPLICATION_DEFAULT_CREDENTIALS",
     "login_customer_id": "GOOGLE_ADS_LOGIN_CUSTOMER_ID",
     "linked_customer_id": "GOOGLE_ADS_LINKED_CUSTOMER_ID",
@@ -39,7 +39,7 @@ _TRUTHY = {"true", "1", "yes"}
 
 
 class ConfigError(Exception):
-    """Fehlerhafte oder fehlende Google-Ads-Konfiguration."""
+    """Invalid or missing Google Ads configuration."""
 
 
 def _resolve_config_path(explicit_path: str | None) -> Path | None:
@@ -61,7 +61,7 @@ def _load_config_file(path: Path | None) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as fh:
         data = yaml.safe_load(fh) or {}
     if not isinstance(data, dict):
-        raise ConfigError(f"Ungueltiges Format in Config-Datei: {path}")
+        raise ConfigError(f"Invalid format in config file: {path}")
     return data
 
 
@@ -70,9 +70,9 @@ def load_merged_config(
     config_path: str | None = None,
     cli_overrides: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Baut das finale Config-Dict fuer GoogleAdsClient.load_from_dict.
+    """Builds the final config dict for GoogleAdsClient.load_from_dict.
 
-    Precedence (niedrig -> hoch): Config-Datei < Env-Vars < CLI-Flags.
+    Precedence (low -> high): config file < env vars < CLI flags.
     """
     merged: dict[str, Any] = _load_config_file(_resolve_config_path(config_path))
 
@@ -89,10 +89,11 @@ def load_merged_config(
             merged["use_application_default_credentials"].strip().lower() in _TRUTHY
         )
 
-    # Erzwingt die Bridge-Invariante: proto-plus-Wrapper (nicht rohe Protobuf-Messages).
-    # proto-plus liefert mit .to_dict()/.from_json() und Dict-Konstruktoren eine deutlich
-    # einfachere generische JSON<->Message-Konvertierung als rohe pb2-Messages, und die
-    # GAPIC-Methodensignaturen sind ohnehin stets gegen proto-plus-Typen annotiert.
+    # Enforces the bridge invariant: proto-plus wrappers (not raw protobuf
+    # messages). proto-plus's own .to_dict()/.from_json() and dict
+    # constructors give a much simpler generic JSON<->message conversion than
+    # raw pb2 messages, and the GAPIC method signatures are annotated against
+    # proto-plus types anyway.
     merged["use_proto_plus"] = True
 
     has_installed_app = all(merged.get(f) for f in ("client_id", "client_secret", "refresh_token"))
@@ -101,23 +102,23 @@ def load_merged_config(
 
     if not (has_installed_app or has_service_account or has_adc):
         raise ConfigError(
-            "Keine Google-Ads-Zugangsdaten gefunden. Eine der folgenden Methoden wird benoetigt: "
-            "(1) OAuth Installed-App-Flow (client_id, client_secret, refresh_token -- via "
-            "'gads auth login' einrichten), (2) Service-Account-JSON-Schluesseldatei "
-            "(json_key_file_path, z.B. per --json-key-file-path/GOOGLE_ADS_JSON_KEY_FILE_PATH; "
-            "die client_email der Schluesseldatei muss als Nutzer auf dem Google-Ads-Konto "
-            "hinterlegt sein), oder (3) Application Default Credentials "
+            "No Google Ads credentials found. One of the following methods is required: "
+            "(1) OAuth installed-app flow (client_id, client_secret, refresh_token -- set up via "
+            "'gads auth login'), (2) a service-account JSON key file "
+            "(json_key_file_path, e.g. via --json-key-file-path/GOOGLE_ADS_JSON_KEY_FILE_PATH; "
+            "the key file's client_email must be added as a user on the Google Ads account), "
+            "or (3) Application Default Credentials "
             "(use_application_default_credentials=true). "
-            f"Alternativ eine Config-Datei unter {DEFAULT_CONFIG_PATH} anlegen. "
-            "'developer_token' ist optional (nicht noetig bei Cloud-managed Access ohne "
-            "klassischen Developer Token)."
+            f"Alternatively, create a config file at {DEFAULT_CONFIG_PATH}. "
+            "'developer_token' is optional (not needed under cloud-managed access without a "
+            "classic developer token)."
         )
 
     return merged
 
 
 def write_config_file(data: dict[str, Any], path: Path | None = None) -> Path:
-    """Schreibt die Config-Datei mit restriktiven Dateirechten (0600)."""
+    """Writes the config file with restrictive file permissions (0600)."""
     target = path or DEFAULT_CONFIG_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
     to_write = dict(data)

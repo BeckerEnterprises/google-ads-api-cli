@@ -1,8 +1,8 @@
-"""`gads accounts list-hierarchy` -- MCC-Kontohierarchie / CIDs auflisten.
+"""`gads accounts list-hierarchy` -- list MCC account hierarchy / CIDs.
 
-Duenner Komfort-Wrapper: die Google Ads API liefert ueber die `customer_client`-
-Ressource bereits die gesamte direkte und indirekte Kontohierarchie eines
-Manager-Kontos (MCC) in einer einzigen GAQL-Abfrage.
+Thin convenience wrapper: the Google Ads API's `customer_client` resource
+already returns the full direct and indirect account hierarchy of a manager
+account (MCC) in a single GAQL query.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from googleadscli import formatting, gaql
 from googleadscli.commands import _common
 from googleadscli.utils import normalize_customer_id
 
-app = typer.Typer(no_args_is_help=True, help="Kontohierarchie / CIDs unter einem MCC")
+app = typer.Typer(no_args_is_help=True, help="Account hierarchy / CIDs under an MCC")
 
 _HIERARCHY_QUERY = """
 SELECT
@@ -32,9 +32,11 @@ WHERE customer_client.status = 'ENABLED'
 @app.command("list-hierarchy")
 def list_hierarchy(
     ctx: typer.Context,
-    customer_id: str = typer.Option(..., "--customer-id", "-c", help="CID des (Manager-)Kontos, ab dem gelistet wird"),
+    customer_id: str = typer.Option(
+        ..., "--customer-id", "-c", help="CID of the (manager) account to list from"
+    ),
 ) -> None:
-    """Listet alle direkten und indirekten Kunden-CIDs unter einem MCC-Konto."""
+    """Lists all direct and indirect client CIDs under an MCC account."""
 
     def _run() -> None:
         client = _common.build_client(ctx)

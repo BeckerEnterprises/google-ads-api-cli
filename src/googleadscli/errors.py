@@ -1,4 +1,4 @@
-"""Strukturierte Fehlerbehandlung fuer Agenten: JSON auf stderr, klare Exit-Codes."""
+"""Structured error handling for agents: JSON on stderr, clear exit codes."""
 
 from __future__ import annotations
 

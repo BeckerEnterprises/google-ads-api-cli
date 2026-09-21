@@ -1,4 +1,4 @@
-"""Ausfuehrung beliebiger GAQL-Abfragen ueber GoogleAdsService."""
+"""Executes arbitrary GAQL queries via GoogleAdsService."""
 
 from __future__ import annotations
 
@@ -13,11 +13,11 @@ def run_query(
     paged: bool = False,
     version: str = DEFAULT_VERSION,
 ) -> list[dict]:
-    """Fuehrt eine GAQL-Abfrage aus und gibt eine flache Liste von Row-Dicts zurueck.
+    """Runs a GAQL query and returns a flat list of row dicts.
 
-    Standard: GoogleAdsService.search_stream (Batches werden zu einer flachen
-    Liste zusammengefuehrt). Mit paged=True wird stattdessen search/SearchPager
-    verwendet (Kompatibilitaets-/Debug-Option).
+    Default: GoogleAdsService.search_stream (batches are merged into one flat
+    list). With paged=True, search/SearchPager is used instead
+    (compatibility/debugging option).
     """
     service = client.get_service("GoogleAdsService", version=version)
     rows: list[dict] = []

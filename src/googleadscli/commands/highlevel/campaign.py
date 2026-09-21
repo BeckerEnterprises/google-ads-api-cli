@@ -1,4 +1,4 @@
-"""`gads hl campaign create|pause|enable|remove` -- Kampagnen verwalten."""
+"""`gads hl campaign create|pause|enable|remove` -- manage campaigns."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from googleadscli import formatting, proto_bridge
 from googleadscli.commands import _common
 from googleadscli.utils import normalize_customer_id
 
-app = typer.Typer(no_args_is_help=True, help="Kampagnen anlegen/verwalten")
+app = typer.Typer(no_args_is_help=True, help="Create/manage campaigns")
 
 
 @app.command("create")
@@ -16,9 +16,9 @@ def create(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
     name: str = typer.Option(..., "--name"),
-    budget_resource_name: str = typer.Option(..., "--budget", help="Resource-Name des CampaignBudget"),
-    advertising_channel_type: str = typer.Option("SEARCH", "--channel-type", help="z.B. SEARCH, DISPLAY, PERFORMANCE_MAX"),
-    status: str = typer.Option("PAUSED", "--status", help="Standard PAUSED, um versehentliche Ausgaben zu vermeiden"),
+    budget_resource_name: str = typer.Option(..., "--budget", help="Resource name of the CampaignBudget"),
+    advertising_channel_type: str = typer.Option("SEARCH", "--channel-type", help="e.g. SEARCH, DISPLAY, PERFORMANCE_MAX"),
+    status: str = typer.Option("PAUSED", "--status", help="Defaults to PAUSED to avoid accidental spend"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     def _run() -> None:
@@ -67,7 +67,7 @@ def _set_status(ctx: typer.Context, customer_id: str, resource_name: str, status
 def pause(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
-    resource_name: str = typer.Argument(..., help="Resource-Name der Kampagne"),
+    resource_name: str = typer.Argument(..., help="Resource name of the campaign"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     _set_status(ctx, customer_id, resource_name, "PAUSED", dry_run)
@@ -77,7 +77,7 @@ def pause(
 def enable(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
-    resource_name: str = typer.Argument(..., help="Resource-Name der Kampagne"),
+    resource_name: str = typer.Argument(..., help="Resource name of the campaign"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     _set_status(ctx, customer_id, resource_name, "ENABLED", dry_run)
@@ -87,7 +87,7 @@ def enable(
 def remove(
     ctx: typer.Context,
     customer_id: str = typer.Option(..., "--customer-id", "-c"),
-    resource_name: str = typer.Argument(..., help="Resource-Name der Kampagne"),
+    resource_name: str = typer.Argument(..., help="Resource name of the campaign"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     def _run() -> None:

@@ -1,4 +1,4 @@
-"""Gemeinsame Hilfsfunktionen fuer Subcommands: Fehler-Guard, Client-Aufbau."""
+"""Shared helpers for subcommands: error guard, client construction."""
 
 from __future__ import annotations
 
@@ -22,5 +22,5 @@ def build_client(ctx: typer.Context):
 def run_guarded(ctx: typer.Context, fn: Callable[[], Any]) -> Any:
     try:
         return fn()
-    except Exception as exc:  # strukturierte Fehlerausgabe statt rohem Traceback
+    except Exception as exc:  # structured error output instead of a raw traceback
         errors.handle_exception(exc, debug=ctx.obj.get("debug", False))
