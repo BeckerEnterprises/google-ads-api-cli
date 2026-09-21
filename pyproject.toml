@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "google-ads-cli"
-version = "0.1.0"
+version = "0.0.1"
 description = "Vollumfaengliche Kommandozeilen-CLI fuer die Google Ads API (v25), fuer die Nutzung durch KI-Agenten"
 readme = "README.md"
 requires-python = ">=3.10"
